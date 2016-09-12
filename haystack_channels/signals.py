@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from django.apps import apps
 from django.db import models
 
-from channels import Channel
 from channels.generic import BaseConsumer
 
 from haystack import connections
@@ -41,9 +40,11 @@ class ChannelsRealTimeAsyncSignalProcessor(BaseSignalProcessor):
         # being used, then disconnecting signals only for those.
 
     def async_save(self, sender, instance, **kwargs):
+        from channels import Channel
         Channel("haystack_channels.item.saved").send(construct_message(instance))
 
     def async_delete(self, sender, instance, **kwargs):
+        from channels import Channel
         Channel("haystack_channels.item.deleted").send(construct_message(instance))
 
 
