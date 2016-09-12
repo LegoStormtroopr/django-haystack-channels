@@ -4,6 +4,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from django.apps import apps
 from django.db import models
+import channels
+print(channels.__file__)
 
 from channels.generic import BaseConsumer
 
