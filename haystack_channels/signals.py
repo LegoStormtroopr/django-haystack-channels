@@ -41,6 +41,13 @@ class ChannelsRealTimeAsyncSignalProcessor(BaseSignalProcessor):
         # being used, then disconnecting signals only for those.
 
     def async_save(self, sender, instance, **kwargs):
+        
+        if instance._meta.app_label is 'migrations':
+            # Migrations send a whole lot of signals in too short a period
+            # Migrations aren't an installed app, so they cause us grief
+            print(sender, type(instance), instance.__class__, instance)
+            return
+        # Migrations send a whole lot of signals in too short a period
         Channel("haystack_channels.item.saved").send(construct_message(instance))
 
     def async_delete(self, sender, instance, **kwargs):
