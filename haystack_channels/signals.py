@@ -46,7 +46,6 @@ class ChannelsRealTimeAsyncSignalProcessor(BaseSignalProcessor):
             # Migrations send a whole lot of signals in too short a period
             # Migrations aren't an installed app, so they cause us grief
             return
-        # Migrations send a whole lot of signals in too short a period
         Channel("haystack_channels.item.saved").send(construct_message(instance))
 
     def async_delete(self, sender, instance, **kwargs):
@@ -66,26 +65,31 @@ class ChannelsAsyncSignalConsumer(BaseConsumer):
         return sender.objects.filter(pk=pk).first()
 
     def get_sender(self, app_label, model_name):
-        return apps.get_model(app_label, model_name)
+        try:
+            return apps.get_model(app_label, model_name)
+        except:
+            return None
 
     def async_save_caught(self, message, **kwargs):
         sender = self.get_sender(message['app_label'], message['model_name'])
-        instance = self.get_instance(sender, message['pk'])
-        if instance:
-            try:
-                index = self.get_index(sender)
-                index.update_object(instance) #, using=using)
-            except NotHandled:
-                # TODO: Maybe log it or let the exception bubble?
-                pass
+        if sender:
+            instance = self.get_instance(sender, message['pk'])
+            if instance:
+                try:
+                    index = self.get_index(sender)
+                    index.update_object(instance) #, using=using)
+                except NotHandled:
+                    # TODO: Maybe log it or let the exception bubble?
+                    pass
 
     def async_delete_caught(self, message, **kwargs):
         sender = self.get_sender(message['app_label'], message['model_name'])
-        instance = self.get_instance(sender, message['pk'])
-        if instance:
-            try:
-                index = self.get_index(sender)
-                index.remove_object(instance) #, using=using)
-            except NotHandled:
-                # TODO: Maybe log it or let the exception bubble?
-                pass
+        if sender:
+            instance = self.get_instance(sender, message['pk'])
+            if instance:
+                try:
+                    index = self.get_index(sender)
+                    index.remove_object(instance) #, using=using)
+                except NotHandled:
+                    # TODO: Maybe log it or let the exception bubble?
+                    pass
