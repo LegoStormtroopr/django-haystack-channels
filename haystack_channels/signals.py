@@ -72,6 +72,7 @@ class ChannelsAsyncSignalConsumer(BaseConsumer):
 
     def async_save_caught(self, message, **kwargs):
         sender = self.get_sender(message['app_label'], message['model_name'])
+        print(sender)
         if sender:
             instance = self.get_instance(sender, message['pk'])
             if instance:
