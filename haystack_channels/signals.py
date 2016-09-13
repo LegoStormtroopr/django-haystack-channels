@@ -71,7 +71,7 @@ class ChannelsAsyncSignalConsumer(BaseConsumer):
 
     def async_delete_caught(self, message, **kwargs):
         sender = self.get_sender(message['app_label'], message['model_name'])
-        instance = sender.filter(pk=message['pk']).first()
+        instance = self.get_instance(sender, message['pk'])
         if instance:
             index = self.get_index(sender)
             index.remove_object(instance) #, using=using)
